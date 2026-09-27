@@ -8,5 +8,15 @@
       "root": "backend",
       "entrypoint": "server.js"
     }
-  }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "service": "backend"
+    },
+    {
+      "src": "/(.*)",
+      "service": "frontend"
+    }
+  ]
 }
