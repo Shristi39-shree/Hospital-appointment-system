@@ -1,22 +1,29 @@
 {
-  "services": {
-    "frontend": {
-      "root": "frontend",
-      "framework": "angular"
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
     },
-    "backend": {
-      "root": "backend",
-      "entrypoint": "server.js"
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/hospital-frontend/browser"
+      }
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "service": "backend"
+      "dest": "api/index.js"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "service": "frontend"
+      "dest": "frontend/dist/hospital-frontend/browser/index.html"
     }
   ]
 }
