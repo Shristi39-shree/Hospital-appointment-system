@@ -1,0 +1,52 @@
+<header class="navbar-header">
+  <div class="container navbar-container">
+    <a routerLink="/" class="brand-logo">
+      <div class="logo-icon">
+        <i class="fa-solid fa-heart-pulse"></i>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">CarePulse</span>
+        <span class="brand-sub">Hospital Network</span>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <ng-container *ngIf="!currentUser">
+        <a routerLink="/login" routerLinkActive="active" class="nav-item">Login</a>
+        <a routerLink="/register" class="btn btn-primary btn-sm">Get Started</a>
+      </ng-container>
+
+      <ng-container *ngIf="currentUser">
+        <a 
+          *ngIf="currentUser.role === 'patient'" 
+          routerLink="/patient-dashboard" 
+          routerLinkActive="active" 
+          class="nav-item"
+        >
+          <i class="fa-solid fa-user-doctor"></i> Find Doctors & Appointments
+        </a>
+
+        <a 
+          *ngIf="currentUser.role === 'doctor'" 
+          routerLink="/doctor-dashboard" 
+          routerLinkActive="active" 
+          class="nav-item"
+        >
+          <i class="fa-solid fa-calendar-check"></i> Doctor Schedule
+        </a>
+
+        <div class="user-menu">
+          <div class="user-badge" [ngClass]="currentUser.role">
+            <i class="fa-solid" [ngClass]="currentUser.role === 'doctor' ? 'fa-user-md' : 'fa-user'"></i>
+            <span>{{ currentUser.name }}</span>
+            <span class="role-pill">{{ currentUser.role }}</span>
+          </div>
+
+          <button (click)="logout()" class="btn btn-secondary btn-sm logout-btn" title="Logout">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </ng-container>
+    </nav>
+  </div>
+</header>

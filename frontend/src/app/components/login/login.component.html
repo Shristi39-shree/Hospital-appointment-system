@@ -1,0 +1,59 @@
+<div class="auth-container">
+  <div class="glass-card auth-card">
+    <div class="auth-header">
+      <h2>Account Sign In</h2>
+      <p class="auth-subtitle">Access your Patient or Doctor portal</p>
+    </div>
+
+    <!-- Quick Demo Buttons -->
+    <div class="demo-buttons-box">
+      <span class="demo-label">Test Accounts:</span>
+      <div class="demo-btn-group">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="fillPatientDemo()">
+          <i class="fa-solid fa-user-injured"></i> Sample Patient
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="fillDoctorDemo()">
+          <i class="fa-solid fa-user-md"></i> Sample Doctor
+        </button>
+      </div>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          class="form-control" 
+          [(ngModel)]="credentials.email" 
+          required 
+          email
+          placeholder="name@example.com"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="form-control" 
+          [(ngModel)]="credentials.password" 
+          required 
+          placeholder="••••••••"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="isLoading || !loginForm.form.valid">
+        <i *ngIf="isLoading" class="fa-solid fa-spinner fa-spin"></i>
+        <span>{{ isLoading ? 'Signing In...' : 'Sign In' }}</span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Don't have an account? <a routerLink="/register">Create Account</a>
+    </div>
+  </div>
+</div>

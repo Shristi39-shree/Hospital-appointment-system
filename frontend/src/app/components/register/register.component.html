@@ -1,0 +1,158 @@
+<div class="auth-container">
+  <div class="glass-card auth-card">
+    <div class="auth-header">
+      <h2>Create Account</h2>
+      <p class="auth-subtitle">Join CarePulse as a Patient or Healthcare Provider</p>
+    </div>
+
+    <!-- Role Toggle selector -->
+    <div class="role-selector">
+      <button 
+        type="button" 
+        class="role-btn" 
+        [class.active]="formData.role === 'patient'"
+        (click)="formData.role = 'patient'"
+      >
+        <i class="fa-solid fa-user-injured"></i> Patient Account
+      </button>
+      <button 
+        type="button" 
+        class="role-btn" 
+        [class.active]="formData.role === 'doctor'"
+        (click)="formData.role = 'doctor'"
+      >
+        <i class="fa-solid fa-user-md"></i> Doctor Profile
+      </button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #regForm="ngForm">
+      <div class="form-group">
+        <label class="form-label" for="name">Full Name *</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          class="form-control" 
+          [(ngModel)]="formData.name" 
+          required 
+          placeholder="e.g. Dr. Jane Foster or Alex Mercer"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address *</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            class="form-control" 
+            [(ngModel)]="formData.email" 
+            required 
+            email
+            placeholder="name@example.com"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number</label>
+          <input 
+            type="text" 
+            id="phone" 
+            name="phone" 
+            class="form-control" 
+            [(ngModel)]="formData.phone" 
+            placeholder="+1 (555) 000-0000"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password *</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="form-control" 
+          [(ngModel)]="formData.password" 
+          required 
+          minlength="6"
+          placeholder="At least 6 characters"
+        />
+      </div>
+
+      <!-- Additional Doctor fields when role === 'doctor' -->
+      <div *ngIf="formData.role === 'doctor'" class="doctor-fields-box">
+        <h4 class="box-title"><i class="fa-solid fa-stethoscope"></i> Professional Medical Profile</h4>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="specialty">Medical Specialty</label>
+            <select id="specialty" name="specialty" class="form-select" [(ngModel)]="formData.specialty">
+              <option *ngFor="let s of specialties" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="experienceYears">Years of Experience</label>
+            <input 
+              type="number" 
+              id="experienceYears" 
+              name="experienceYears" 
+              class="form-control" 
+              [(ngModel)]="formData.experienceYears" 
+              min="0"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="qualifications">Qualifications</label>
+            <input 
+              type="text" 
+              id="qualifications" 
+              name="qualifications" 
+              class="form-control" 
+              [(ngModel)]="formData.qualifications" 
+              placeholder="e.g. MBBS, MD, FACC"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="consultationFee">Consultation Fee ($)</label>
+            <input 
+              type="number" 
+              id="consultationFee" 
+              name="consultationFee" 
+              class="form-control" 
+              [(ngModel)]="formData.consultationFee" 
+              min="0"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="bio">Professional Bio</label>
+          <textarea 
+            id="bio" 
+            name="bio" 
+            class="form-control" 
+            rows="3" 
+            [(ngModel)]="formData.bio"
+            placeholder="Brief summary of clinical expertise and patient care philosophy..."
+          ></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="isLoading || !regForm.form.valid">
+        <i *ngIf="isLoading" class="fa-solid fa-spinner fa-spin"></i>
+        <span>{{ isLoading ? 'Creating Account...' : 'Register Account' }}</span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Already registered? <a routerLink="/login">Sign In</a>
+    </div>
+  </div>
+</div>

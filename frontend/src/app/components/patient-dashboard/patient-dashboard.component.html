@@ -1,0 +1,314 @@
+<div class="container main-content">
+  <!-- Welcome Banner -->
+  <div class="glass-card welcome-banner">
+    <div class="welcome-text">
+      <h2>Welcome back, {{ patientName }} 👋</h2>
+      <p>Search qualified medical specialists, select preferred time slots, and manage your appointments.</p>
+    </div>
+    <div class="banner-badge">
+      <i class="fa-solid fa-heart-pulse"></i> Patient Portal Active
+    </div>
+  </div>
+
+  <!-- SECTION 1: Doctor Search & Catalog -->
+  <section class="dashboard-section">
+    <div class="section-header">
+      <div class="section-title-box">
+        <h3><i class="fa-solid fa-user-doctor"></i> Available Medical Specialists</h3>
+        <p class="section-subtitle">Found {{ doctorsTotal }} registered doctors available for consultations</p>
+      </div>
+      
+      <div class="filter-controls">
+        <!-- Search input -->
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input 
+            type="text" 
+            class="form-control search-input" 
+            placeholder="Search by doctor name or specialty..."
+            [(ngModel)]="searchTerm" 
+            (ngModelChange)="onSearchChange()"
+          />
+        </div>
+
+        <!-- Specialty Filter -->
+        <select class="form-select specialty-select" [(ngModel)]="selectedSpecialty" (change)="onSpecialtyChange()">
+          <option *ngFor="let spec of specialties" [value]="spec">{{ spec }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="isDoctorsLoading" class="loading-box">
+      <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
+      <p>Loading medical specialists...</p>
+    </div>
+
+    <!-- Doctors Grid -->
+    <div *ngIf="!isDoctorsLoading && doctors.length > 0" class="doctors-grid">
+      <div *ngFor="let doc of doctors" class="glass-card doctor-card">
+        <div class="doctor-card-header">
+          <div class="doctor-avatar">
+            <i class="fa-solid fa-user-md"></i>
+          </div>
+          <div class="doctor-info">
+            <h4 class="doctor-name">{{ getDoctorName(doc.userId) }}</h4>
+            <span class="specialty-badge">{{ doc.specialty }}</span>
+          </div>
+        </div>
+
+        <div class="doctor-details">
+          <p class="qualifications"><i class="fa-solid fa-graduation-cap"></i> {{ doc.qualifications }}</p>
+          <div class="meta-row">
+            <span><i class="fa-solid fa-briefcase"></i> {{ doc.experienceYears }} Years Exp.</span>
+            <span class="fee-text"><i class="fa-solid fa-dollar-sign"></i> {{ doc.consultationFee }} / session</span>
+          </div>
+          <p class="bio-text">{{ doc.bio }}</p>
+        </div>
+
+        <div class="slots-info-box">
+          <span class="slots-available-text">
+            <i class="fa-solid fa-calendar-days"></i>
+            {{ getAvailableSlotsCount(doc.availableSlots) }} Open Slots Available
+          </span>
+        </div>
+
+        <button 
+          class="btn btn-primary btn-block" 
+          (click)="openBookingModal(doc)"
+          [disabled]="getAvailableSlotsCount(doc.availableSlots) === 0"
+        >
+          <i class="fa-solid fa-calendar-plus"></i> 
+          {{ getAvailableSlotsCount(doc.availableSlots) > 0 ? 'Book Appointment' : 'No Slots Available' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!isDoctorsLoading && doctors.length === 0" class="empty-state glass-card">
+      <i class="fa-solid fa-user-slash fa-3x"></i>
+      <h4>No doctors match your criteria</h4>
+      <p>Try clearing your search query or selecting a different specialty filter.</p>
+    </div>
+
+    <!-- Doctors Pagination -->
+    <div *ngIf="doctorsTotalPages > 1" class="pagination-container">
+      <span class="pagination-info">Page {{ doctorsPage }} of {{ doctorsTotalPages }}</span>
+      <div class="pagination-controls">
+        <button 
+          class="btn btn-secondary btn-sm" 
+          [disabled]="doctorsPage === 1" 
+          (click)="changeDoctorPage(doctorsPage - 1)"
+        >
+          <i class="fa-solid fa-chevron-left"></i> Previous
+        </button>
+        <button 
+          class="btn btn-secondary btn-sm" 
+          [disabled]="doctorsPage === doctorsTotalPages" 
+          (click)="changeDoctorPage(doctorsPage + 1)"
+        >
+          Next <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: Patient's Booked Appointments -->
+  <section class="dashboard-section margin-top-lg">
+    <div class="section-header">
+      <div class="section-title-box">
+        <h3><i class="fa-solid fa-clock-rotate-left"></i> My Appointments History</h3>
+        <p class="section-subtitle">Track status and manage your scheduled hospital visits</p>
+      </div>
+
+      <div class="status-filter-buttons">
+        <button 
+          class="btn btn-sm" 
+          [class.btn-primary]="appointmentStatusFilter === 'All'" 
+          [class.btn-secondary]="appointmentStatusFilter !== 'All'"
+          (click)="appointmentStatusFilter = 'All'; onAppointmentFilterChange()"
+        >All</button>
+        <button 
+          class="btn btn-sm" 
+          [class.btn-primary]="appointmentStatusFilter === 'Pending'" 
+          [class.btn-secondary]="appointmentStatusFilter !== 'Pending'"
+          (click)="appointmentStatusFilter = 'Pending'; onAppointmentFilterChange()"
+        >Pending</button>
+        <button 
+          class="btn btn-sm" 
+          [class.btn-primary]="appointmentStatusFilter === 'Confirmed'" 
+          [class.btn-secondary]="appointmentStatusFilter !== 'Confirmed'"
+          (click)="appointmentStatusFilter = 'Confirmed'; onAppointmentFilterChange()"
+        >Confirmed</button>
+        <button 
+          class="btn btn-sm" 
+          [class.btn-primary]="appointmentStatusFilter === 'Completed'" 
+          [class.btn-secondary]="appointmentStatusFilter !== 'Completed'"
+          (click)="appointmentStatusFilter = 'Completed'; onAppointmentFilterChange()"
+        >Completed</button>
+        <button 
+          class="btn btn-sm" 
+          [class.btn-primary]="appointmentStatusFilter === 'Cancelled'" 
+          [class.btn-secondary]="appointmentStatusFilter !== 'Cancelled'"
+          (click)="appointmentStatusFilter = 'Cancelled'; onAppointmentFilterChange()"
+        >Cancelled</button>
+      </div>
+    </div>
+
+    <div class="glass-card table-card">
+      <div *ngIf="isAppointmentsLoading" class="loading-box">
+        <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
+        <p>Retrieving your appointment records...</p>
+      </div>
+
+      <div *ngIf="!isAppointmentsLoading && appointments.length > 0" class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Doctor</th>
+              <th>Specialty</th>
+              <th>Date & Time</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let app of appointments">
+              <td>
+                <div class="doctor-table-cell">
+                  <strong>{{ getDoctorName(app.doctorId?.userId) }}</strong>
+                </div>
+              </td>
+              <td>
+                <span class="specialty-pill">{{ app.doctorId?.specialty }}</span>
+              </td>
+              <td>
+                <div class="date-cell">
+                  <span><i class="fa-regular fa-calendar"></i> {{ app.date }}</span>
+                  <span class="time-text"><i class="fa-regular fa-clock"></i> {{ app.timeSlot.startTime }} - {{ app.timeSlot.endTime }}</span>
+                </div>
+              </td>
+              <td>{{ app.reason }}</td>
+              <td>
+                <span class="badge" [ngClass]="'badge-' + app.status.toLowerCase()">
+                  {{ app.status }}
+                </span>
+              </td>
+              <td>
+                <button 
+                  *ngIf="app.status === 'Pending' || app.status === 'Confirmed'" 
+                  class="btn btn-danger btn-sm"
+                  (click)="cancelAppointment(app._id)"
+                >
+                  <i class="fa-solid fa-ban"></i> Cancel
+                </button>
+                <span *ngIf="app.status === 'Completed' || app.status === 'Cancelled'" class="text-muted text-sm">
+                  N/A
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty state for appointments -->
+      <div *ngIf="!isAppointmentsLoading && appointments.length === 0" class="empty-state">
+        <i class="fa-solid fa-calendar-xmark fa-3x"></i>
+        <h4>No appointment history found</h4>
+        <p>When you book appointments with doctors above, they will be tracked right here.</p>
+      </div>
+
+      <!-- Appointments Pagination -->
+      <div *ngIf="appointmentsTotalPages > 1" class="pagination-container">
+        <span class="pagination-info">Page {{ appointmentsPage }} of {{ appointmentsTotalPages }}</span>
+        <div class="pagination-controls">
+          <button 
+            class="btn btn-secondary btn-sm" 
+            [disabled]="appointmentsPage === 1" 
+            (click)="changeAppointmentPage(appointmentsPage - 1)"
+          >
+            <i class="fa-solid fa-chevron-left"></i> Previous
+          </button>
+          <button 
+            class="btn btn-secondary btn-sm" 
+            [disabled]="appointmentsPage === appointmentsTotalPages" 
+            (click)="changeAppointmentPage(appointmentsPage + 1)"
+          >
+            Next <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- BOOKING MODAL DIALOG -->
+<div *ngIf="isBookingModalOpen" class="modal-overlay" (click)="closeBookingModal()">
+  <div class="modal-content glass-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h3>Book Doctor Appointment</h3>
+        <p class="modal-subtitle" *ngIf="selectedDoctor">
+          {{ getDoctorName(selectedDoctor.userId) }} ({{ selectedDoctor.specialty }})
+        </p>
+      </div>
+      <button class="modal-close-btn" (click)="closeBookingModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedDoctor">
+      <div class="doctor-summary-box">
+        <div><strong>Consultation Fee:</strong> ${{ selectedDoctor.consultationFee }}</div>
+        <div><strong>Qualifications:</strong> {{ selectedDoctor.qualifications }}</div>
+      </div>
+
+      <!-- Select Time Slot -->
+      <div class="form-group">
+        <label class="form-label">Choose Available Time Slot *</label>
+
+        <div *ngIf="selectedDoctor.availableSlots.length === 0" class="no-slots-alert">
+          No time slots are currently listed by this doctor.
+        </div>
+
+        <div class="slots-grid">
+          <div 
+            *ngFor="let slot of selectedDoctor.availableSlots" 
+            class="slot-chip" 
+            [class.booked]="slot.isBooked"
+            [class.selected]="selectedSlot === slot"
+            (click)="selectSlot(slot)"
+          >
+            <div class="slot-date">{{ slot.date }}</div>
+            <div class="slot-time">{{ slot.startTime }} - {{ slot.endTime }}</div>
+            <div *ngIf="slot.isBooked" class="booked-label">Reserved</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group margin-top-md">
+        <label class="form-label" for="reason">Reason for Consultation</label>
+        <textarea 
+          id="reason" 
+          class="form-control" 
+          rows="3" 
+          [(ngModel)]="bookingReason"
+          placeholder="Describe your symptoms or reason for visit..."
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeBookingModal()">Cancel</button>
+      <button 
+        class="btn btn-primary" 
+        [disabled]="!selectedSlot || isSubmittingBooking"
+        (click)="confirmBooking()"
+      >
+        <i *ngIf="isSubmittingBooking" class="fa-solid fa-spinner fa-spin"></i>
+        <span>{{ isSubmittingBooking ? 'Booking...' : 'Confirm Appointment' }}</span>
+      </button>
+    </div>
+  </div>
+</div>

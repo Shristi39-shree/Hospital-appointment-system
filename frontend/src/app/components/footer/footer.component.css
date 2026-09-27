@@ -1,0 +1,41 @@
+.app-footer {
+  background: rgba(15, 23, 42, 0.95);
+  border-top: 1px solid var(--border-color);
+  padding: 1.5rem 0;
+  margin-top: 3rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-brand {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-brand i {
+  color: var(--accent-cyan);
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.8rem;
+}
+
+.footer-links span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}

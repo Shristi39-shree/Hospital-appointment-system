@@ -1,0 +1,244 @@
+.welcome-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2.5rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.banner-badge.doctor {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: var(--accent-emerald);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dashboard-section {
+  margin-bottom: 2.5rem;
+}
+
+.margin-top-lg {
+  margin-top: 3rem;
+}
+
+.margin-top-md {
+  margin-top: 1.25rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-title-box h3 {
+  font-size: 1.35rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.section-title-box h3 i {
+  color: var(--accent-emerald);
+}
+
+.section-subtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.slot-manager-card {
+  padding: 1.75rem;
+}
+
+.card-subtitle {
+  font-size: 1.05rem;
+  color: white;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-subtitle i {
+  color: var(--accent-cyan);
+}
+
+.slot-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+@media (max-width: 768px) {
+  .slot-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-align {
+  margin-bottom: 0;
+}
+
+.active-slots-box {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  border: 1px solid var(--border-color);
+}
+
+.empty-state-sm {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 0.75rem 0;
+}
+
+.doctor-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+.doctor-slot-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.doctor-slot-card.booked {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.slot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.slot-date-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.slot-status-pill {
+  font-size: 0.675rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--accent-emerald);
+  text-transform: uppercase;
+}
+
+.slot-status-pill.booked {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.slot-time-text {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: white;
+}
+
+.remove-slot-btn {
+  margin-top: 0.35rem;
+  width: 100%;
+}
+
+.table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.patient-cell {
+  color: white;
+}
+
+.contact-cell {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.825rem;
+}
+
+.date-cell {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+}
+
+.time-text {
+  color: var(--text-muted);
+  font-size: 0.775rem;
+}
+
+.status-filter-buttons {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.appointment-summary {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.modal-header h3 {
+  font-size: 1.35rem;
+  color: white;
+}
+
+.modal-subtitle {
+  color: var(--accent-cyan);
+  font-size: 0.875rem;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}

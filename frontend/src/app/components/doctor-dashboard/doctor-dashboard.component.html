@@ -1,0 +1,300 @@
+<div class="container main-content">
+  <!-- Welcome Banner -->
+  <div class="glass-card welcome-banner">
+    <div class="welcome-text">
+      <h2>Doctor Schedule Portal - {{ doctorName }} 🩺</h2>
+      <p>Manage your clinical availability, review upcoming patient consults, and update appointment statuses.</p>
+    </div>
+    <div class="banner-badge doctor">
+      <i class="fa-solid fa-user-md"></i> Doctor Dashboard Active
+    </div>
+  </div>
+
+  <!-- SECTION 1: Availability Slot Manager -->
+  <section class="dashboard-section">
+    <div class="section-header">
+      <div class="section-title-box">
+        <h3><i class="fa-solid fa-calendar-plus"></i> Manage Availability & Time Slots</h3>
+        <p class="section-subtitle">Add or remove consultation time slots for patient booking</p>
+      </div>
+    </div>
+
+    <!-- Add Slot Form Card -->
+    <div class="glass-card slot-manager-card">
+      <h4 class="card-subtitle"><i class="fa-solid fa-clock"></i> Add New Available Time Slot</h4>
+      
+      <form (ngSubmit)="addSlot()" class="slot-form">
+        <div class="form-group">
+          <label class="form-label" for="slotDate">Date *</label>
+          <input 
+            type="date" 
+            id="slotDate" 
+            name="slotDate" 
+            class="form-control" 
+            [(ngModel)]="newSlot.date" 
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="startTime">Start Time *</label>
+          <input 
+            type="time" 
+            id="startTime" 
+            name="startTime" 
+            class="form-control" 
+            [(ngModel)]="newSlot.startTime" 
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="endTime">End Time *</label>
+          <input 
+            type="time" 
+            id="endTime" 
+            name="endTime" 
+            class="form-control" 
+            [(ngModel)]="newSlot.endTime" 
+            required
+          />
+        </div>
+
+        <div class="form-group btn-align">
+          <button type="submit" class="btn btn-primary" [disabled]="isAddingSlot">
+            <i *ngIf="isAddingSlot" class="fa-solid fa-spinner fa-spin"></i>
+            <span>{{ isAddingSlot ? 'Adding...' : 'Add Slot' }}</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Active Slots Chips Display -->
+      <div class="active-slots-box margin-top-md" *ngIf="doctorProfile">
+        <h4 class="card-subtitle">
+          <i class="fa-solid fa-list-check"></i> Current Availability Schedule ({{ doctorProfile.availableSlots.length }} total slots)
+        </h4>
+
+        <div *ngIf="doctorProfile.availableSlots.length === 0" class="empty-state-sm">
+          No time slots currently listed. Add a new slot above to allow patient bookings.
+        </div>
+
+        <div *ngIf="doctorProfile.availableSlots.length > 0" class="doctor-slots-grid">
+          <div 
+            *ngFor="let slot of doctorProfile.availableSlots" 
+            class="doctor-slot-card"
+            [class.booked]="slot.isBooked"
+          >
+            <div class="slot-header">
+              <span class="slot-date-text">{{ slot.date }}</span>
+              <span class="slot-status-pill" [class.booked]="slot.isBooked">
+                {{ slot.isBooked ? 'Booked' : 'Available' }}
+              </span>
+            </div>
+            
+            <div class="slot-time-text">
+              <i class="fa-regular fa-clock"></i> {{ slot.startTime }} - {{ slot.endTime }}
+            </div>
+
+            <button 
+              *ngIf="!slot.isBooked && slot._id" 
+              class="btn btn-danger btn-sm remove-slot-btn" 
+              (click)="deleteSlot(slot._id)"
+              title="Remove Slot"
+            >
+              <i class="fa-solid fa-trash"></i> Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: Patient Appointment Requests & History -->
+  <section class="dashboard-section margin-top-lg">
+    <div class="section-header">
+      <div class="section-title-box">
+        <h3><i class="fa-solid fa-users"></i> Patient Appointments Schedule</h3>
+        <p class="section-subtitle">Review patient bookings, confirm appointments, or mark completed</p>
+      </div>
+
+      <!-- Filter status buttons -->
+      <div class="status-filter-buttons">
+        <button 
+          class="btn btn-sm" 
+          [class.btn-primary]="statusFilter === 'All'" 
+          [class.btn-secondary]="statusFilter !== 'All'"
+          (click)="statusFilter = 'All'; onFilterChange()"
+        >All</button>
+        <button 
+          class="btn btn-sm" 
+          [class.btn-primary]="statusFilter === 'Pending'" 
+          [class.btn-secondary]="statusFilter !== 'Pending'"
+          (click)="statusFilter = 'Pending'; onFilterChange()"
+        >Pending</button>
+        <button 
+          class="btn btn-sm" 
+          [class.btn-primary]="statusFilter === 'Confirmed'" 
+          [class.btn-secondary]="statusFilter !== 'Confirmed'"
+          (click)="statusFilter = 'Confirmed'; onFilterChange()"
+        >Confirmed</button>
+        <button 
+          class="btn btn-sm" 
+          [class.btn-primary]="statusFilter === 'Completed'" 
+          [class.btn-secondary]="statusFilter !== 'Completed'"
+          (click)="statusFilter = 'Completed'; onFilterChange()"
+        >Completed</button>
+        <button 
+          class="btn btn-sm" 
+          [class.btn-primary]="statusFilter === 'Cancelled'" 
+          [class.btn-secondary]="statusFilter !== 'Cancelled'"
+          (click)="statusFilter = 'Cancelled'; onFilterChange()"
+        >Cancelled</button>
+      </div>
+    </div>
+
+    <div class="glass-card table-card">
+      <div *ngIf="isAppointmentsLoading" class="loading-box">
+        <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
+        <p>Fetching patient appointments...</p>
+      </div>
+
+      <div *ngIf="!isAppointmentsLoading && appointments.length > 0" class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Patient Name</th>
+              <th>Contact Info</th>
+              <th>Date & Time</th>
+              <th>Consultation Reason</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let app of appointments">
+              <td>
+                <div class="patient-cell">
+                  <strong><i class="fa-solid fa-user-injured"></i> {{ getPatientName(app.patientId) }}</strong>
+                </div>
+              </td>
+              <td>
+                <div class="contact-cell">
+                  <span><i class="fa-regular fa-envelope"></i> {{ getPatientEmail(app.patientId) }}</span>
+                  <span class="text-dim" *ngIf="getPatientPhone(app.patientId)">
+                    <i class="fa-solid fa-phone"></i> {{ getPatientPhone(app.patientId) }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="date-cell">
+                  <span><i class="fa-regular fa-calendar"></i> {{ app.date }}</span>
+                  <span class="time-text"><i class="fa-regular fa-clock"></i> {{ app.timeSlot.startTime }} - {{ app.timeSlot.endTime }}</span>
+                </div>
+              </td>
+              <td>{{ app.reason }}</td>
+              <td>
+                <span class="badge" [ngClass]="'badge-' + app.status.toLowerCase()">
+                  {{ app.status }}
+                </span>
+              </td>
+              <td>
+                <button 
+                  class="btn btn-secondary btn-sm"
+                  (click)="openStatusModal(app)"
+                >
+                  <i class="fa-solid fa-pen-to-square"></i> Manage
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isAppointmentsLoading && appointments.length === 0" class="empty-state">
+        <i class="fa-solid fa-calendar-check fa-3x"></i>
+        <h4>No appointments found for this filter</h4>
+        <p>When patients book available slots, their details will display right here.</p>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="appointmentsTotalPages > 1" class="pagination-container">
+        <span class="pagination-info">Page {{ appointmentsPage }} of {{ appointmentsTotalPages }}</span>
+        <div class="pagination-controls">
+          <button 
+            class="btn btn-secondary btn-sm" 
+            [disabled]="appointmentsPage === 1" 
+            (click)="changePage(appointmentsPage - 1)"
+          >
+            <i class="fa-solid fa-chevron-left"></i> Previous
+          </button>
+          <button 
+            class="btn btn-secondary btn-sm" 
+            [disabled]="appointmentsPage === appointmentsTotalPages" 
+            (click)="changePage(appointmentsPage + 1)"
+          >
+            Next <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- MANAGE APPOINTMENT STATUS MODAL -->
+<div *ngIf="isStatusModalOpen" class="modal-overlay" (click)="closeStatusModal()">
+  <div class="modal-content glass-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h3>Manage Patient Appointment</h3>
+        <p class="modal-subtitle" *ngIf="selectedAppointment">
+          Patient: {{ getPatientName(selectedAppointment.patientId) }}
+        </p>
+      </div>
+      <button class="modal-close-btn" (click)="closeStatusModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedAppointment">
+      <div class="appointment-summary">
+        <div><strong>Date:</strong> {{ selectedAppointment.date }}</div>
+        <div><strong>Time:</strong> {{ selectedAppointment.timeSlot.startTime }} - {{ selectedAppointment.timeSlot.endTime }}</div>
+        <div><strong>Reason:</strong> {{ selectedAppointment.reason }}</div>
+      </div>
+
+      <div class="form-group margin-top-md">
+        <label class="form-label" for="statusSelect">Update Appointment Status *</label>
+        <select id="statusSelect" class="form-select" [(ngModel)]="newStatus">
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <div class="form-group margin-top-md">
+        <label class="form-label" for="notes">Doctor Clinical Notes</label>
+        <textarea 
+          id="notes" 
+          class="form-control" 
+          rows="3" 
+          [(ngModel)]="doctorNotes"
+          placeholder="Enter consultation notes, prescription summary, or instructions..."
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeStatusModal()">Cancel</button>
+      <button 
+        class="btn btn-primary" 
+        [disabled]="isUpdatingStatus"
+        (click)="updateAppointmentStatus()"
+      >
+        <i *ngIf="isUpdatingStatus" class="fa-solid fa-spinner fa-spin"></i>
+        <span>{{ isUpdatingStatus ? 'Updating...' : 'Save Status' }}</span>
+      </button>
+    </div>
+  </div>
+</div>
