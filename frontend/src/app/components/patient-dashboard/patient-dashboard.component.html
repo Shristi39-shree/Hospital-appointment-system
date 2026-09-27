@@ -177,11 +177,11 @@
             <tr *ngFor="let app of appointments">
               <td>
                 <div class="doctor-table-cell">
-                  <strong>{{ getDoctorName(app.doctorId?.userId) }}</strong>
+                  <strong>{{ getDoctorName(app.doctorId.userId) }}</strong>
                 </div>
               </td>
               <td>
-                <span class="specialty-pill">{{ app.doctorId?.specialty }}</span>
+                <span class="specialty-pill">{{ app.doctorId.specialty }}</span>
               </td>
               <td>
                 <div class="date-cell">
